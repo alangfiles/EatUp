@@ -1,0 +1,343 @@
+<html>
+    <head>
+        <title></title>
+        
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+    </head>
+    <body>
+        
+
+
+<div id="G" style="width: 410px; height: 400px; float:left;"></div>
+<div id="V" style="width: 410px; height: 400px; float:left;"></div>
+<div id="O" style="width: 410px; height: 400px; float:left;"></div>
+<div id="P" style="width: 410px; height: 400px; float:left;"></div>
+<div id="controls">
+    <button id="playGames">Play/Pause Games</button>
+    <div id="stats"></div>
+</div>
+        
+        
+        
+        <script>
+            var categories = [];
+            var intialData = [];
+            var stepsize = 1;
+            var gamesPlayed = 0;
+            var highestNumber = 0; //used for yAxis on charts
+            var totals = { "G":0, "V":0, "O":0, "P":0};
+
+    
+            
+            for(var i =0; i < 30;i++){
+                categories.push(i*stepsize);
+                intialData.push(0);
+            }
+            
+            var updateGame;
+            var gameOn = false;
+$(function () {
+    Highcharts.setOptions({
+        chart: {type: 'column'},
+        legend: {enabled: false},
+        credits: {enabled: false},
+        yAxis: {
+            title:{text:''},
+            allowDecimals: false
+        },
+        plotOptions: {
+            series: {
+                pointPadding: 0,
+                groupPadding: 0,
+                borderWidth: 0,
+                shadow: false
+            }
+        },
+        tooltip: {
+            enabled: false
+        }
+    });
+    $('#G').highcharts({
+        title: {text:'Vegetarian'},
+        xAxis: {categories: categories},
+        series: [{data: intialData}]
+    });
+    $('#V').highcharts({
+        title: {text:'Vegan'},
+        xAxis: {categories: categories},
+        series: [{data: intialData}]
+    });
+    $('#O').highcharts({
+        title: {text:'Omnivore'},
+        xAxis: {categories: categories},
+        series: [{data: intialData}]
+    });
+    $('#P').highcharts({
+        title: {text:'Paleo'},
+        xAxis: {categories: categories},
+        series: [{data: intialData}]
+    });
+
+    
+    $('#playGames').click(function () {
+        gameOn = !gameOn;
+        if(gameOn){
+            clearStats();
+            updateGame = setInterval( playAndUpdate, 100);
+        }
+        else{
+            clearInterval(updateGame);
+            updateStats();
+        }
+        
+    });
+});
+        
+function updateStats(){
+    var html = "<p> Games Played: "+gamesPlayed+"</p>";
+    html += "<p>Vegetarian Avg: "+(totals.G /gamesPlayed).toFixed(3) +"</p>";
+    html += "<p>Vegan Avg: "+(totals.V /gamesPlayed).toFixed(3) +"</p>";
+    html += "<p>Omnivore Avg: "+(totals.O /gamesPlayed).toFixed(3) +"</p>";
+    html += "<p>Paleo Avg: "+(totals.P /gamesPlayed).toFixed(3) +"</p>";
+    
+    $("#stats").html(html);
+}
+function clearStats(){
+     $("#stats").html('');
+}
+            
+function playAndUpdate(){
+    var gameResult = playGame(4);
+    gamesPlayed += 1;
+    totals.G += gameResult.G;
+    totals.V += gameResult.V;
+    totals.O += gameResult.O;
+    totals.P += gameResult.P;
+    
+    //update graphs
+    for(var i = 0; i < categories.length;i++){
+        if( Math.abs(gameResult.G - categories[i]) <= stepsize/2){
+            
+            var chart = $('#G').highcharts();
+            highestNumber = (chart.series[0].data[i].y < highestNumber ? highestNumber : chart.series[0].data[i].y+1);
+            chart.yAxis[0].setExtremes(0,highestNumber, false);
+            chart.series[0].data[i].update(chart.series[0].data[i].y+1);
+            gameResult.G = undefined;
+        }
+        if( Math.abs(gameResult.V - categories[i]) <= stepsize/2){
+            var chart = $('#V').highcharts();
+            highestNumber = (chart.series[0].data[i].y < highestNumber ? highestNumber : chart.series[0].data[i].y+1);
+            chart.yAxis[0].setExtremes(0,highestNumber, false);
+            chart.series[0].data[i].update(chart.series[0].data[i].y+1);
+            
+            gameResult.V = undefined;
+        }
+        if( Math.abs(gameResult.O - categories[i]) <= stepsize/2){
+            var chart = $('#O').highcharts();
+            highestNumber = (chart.series[0].data[i].y < highestNumber ? highestNumber : chart.series[0].data[i].y+1);
+            chart.yAxis[0].setExtremes(0,highestNumber, false);
+            chart.series[0].data[i].update(chart.series[0].data[i].y+1);
+            gameResult.O = undefined;
+        }
+        if( Math.abs(gameResult.P - categories[i]) <= stepsize/2){
+            var chart = $('#P').highcharts();
+            highestNumber = (chart.series[0].data[i].y < highestNumber ? highestNumber : chart.series[0].data[i].y+1);
+            chart.yAxis[0].setExtremes(0,highestNumber, false);
+            chart.series[0].data[i].update(chart.series[0].data[i].y+1);
+            gameResult.P = undefined;
+        }
+    }       
+}
+// game running:
+var cards, characterClasses;
+var debug = false;
+function playGame(numCharacters){
+
+    initializeGame();
+    var numRounds = 7; // 4 players -> 28 cards, 3 players -> 24 cards, 2 players -> 20 cards
+
+    //shuffle the characters
+    characterClasses.sort(function() { return 0.5 - Math.random() } );
+    //shuffle the cards
+    cards.sort(function() { return 0.5 - Math.random() } );
+
+    //select the characters
+    var characters = characterClasses.slice(0, numCharacters);
+
+    var PlayerArray = [];
+    //each character gets 6 cards
+    for(var i = 0, c; c = characters[i]; i++){
+        var newPlayer = {};
+        newPlayer.CharacterClass = c;
+        newPlayer.currentHand = cards.splice(0,numRounds+1) //grab 6 cards
+        newPlayer.playedCards = [];
+        newPlayer.score = 0;
+        PlayerArray.push(newPlayer);
+    }
+
+    if(debug){
+        console.log("Starting Game");
+        console.log("Players: ");
+        console.log(PlayerArray);
+    }
+
+    //go through the rounds of the game
+    for(var i = 0; i < numRounds; i++){
+        //pick a card
+        for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
+            var cardValue = -20; //assume a super negative value to compare against
+            var cardFromSet;
+            for(var k = 0, card; card = currentPlayer.currentHand[k]; k++){
+                if(card[currentPlayer.CharacterClass] > cardValue){
+                    cardValue = card[currentPlayer.CharacterClass];
+                    cardFromSet = card;
+                }
+            }
+            currentPlayer.playedCards.push(cardFromSet);
+            currentPlayer.currentHand.splice(currentPlayer.currentHand.indexOf(cardFromSet),1);
+        }
+
+        //pass the cards
+        //get the first players hand, to hold and give to the last.
+        var placeHolder = PlayerArray[0].currentHand;
+        for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
+            //if it's not the last player in the list
+            if(! typeof PlayerArray[j++] === undefined ){
+                currentPlayer.currentHand = PlayerArray[j++].currentHand;
+            }
+            else{
+                currentPlayer.currentHand = placeHolder;
+            }
+        }
+    }
+
+
+
+    //calculateScores with Class based bonuses
+    for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
+        var multiplier = 1;
+        if(currentPlayer.CharacterClass == 'V'){
+            multiplier = 2;
+            for(var i = 0, card; card = currentPlayer.playedCards[i]; i++){
+
+                currentPlayer.score += card[currentPlayer.CharacterClass];
+
+                if(card[currentPlayer.CharacterClass] > 0){
+                     currentPlayer.score +=  multiplier;
+                }
+            }
+        }
+        else if( currentPlayer.CharacterClass == 'G'){
+            //no multiplier for vegetarian, +2 for every 2 cards
+            var edibleCard =0;
+            for(var i = 0, card; card = currentPlayer.playedCards[i]; i++){
+
+                currentPlayer.score += card[currentPlayer.CharacterClass];
+
+                if(card[currentPlayer.CharacterClass] > 0){
+                     edibleCard++;
+                }
+
+            }
+            currentPlayer.score += Math.floor(edibleCard/2) * 2;
+        }
+        else if( currentPlayer.CharacterClass == 'P'){ //paleo
+            multiplier = 0.5;
+            for(var i = 0, card; card = currentPlayer.playedCards[i]; i++){
+
+                currentPlayer.score += card[currentPlayer.CharacterClass];
+
+                if(card[currentPlayer.CharacterClass] > 0){
+                     currentPlayer.score +=  multiplier;
+                }
+            }
+        }
+        else{ //OMNIVORE
+            multiplier = 0;
+            for(var i = 0, card; card = currentPlayer.playedCards[i]; i++){
+                currentPlayer.score += card[currentPlayer.CharacterClass];
+
+                if(card[currentPlayer.CharacterClass] > 0){
+                     currentPlayer.score +=  multiplier;
+                }
+            }
+        }
+
+
+    }
+
+    if(debug){console.log("End Of Game");}
+    var returnScores = {};
+    for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
+        returnScores[currentPlayer.CharacterClass] = currentPlayer.score;
+        if(debug){console.log(currentPlayer.CharacterClass + ": "+ currentPlayer.score);}
+    }
+
+    return returnScores;
+}
+
+function initializeGame(){
+    cards = [
+    //16 base cards
+    //current results: 
+    {G:2,  V:3,  O: 1, P: 1},
+    {G:2,  V:3,  O: 1, P: 1},
+    {G:1,  V:2,  O: 1, P: 1},
+    {G:4,  V:1,  O: 1, P: 1},
+    {G:3,  V:0,  O: 1, P: 1},
+    {G:2,  V:1,  O: 1, P: 1},
+    {G:2,  V:0,  O: 1, P: 0},
+    {G:2,  V:-1, O: 2, P: -1},
+    {G:0,  V:0,  O: 2, P: 1},
+    {G:-1, V:-1, O: 2, P: 2},
+    {G:1,  V:-1, O: 2, P: 2},
+    {G:-4, V:-4, O: 3, P: 4},
+    {G:1,  V:-1, O: 2, P: 1},
+    {G:0,  V:0,  O: 3, P: 2},
+    {G:1,  V:0,  O: 2, P: 1},
+    {G:1,  V:1,  O: 2, P: 2},    
+
+    //good for all
+    {G:2, V:2, O: 2, P: 2},
+    {G:2, V:2, O: 2, P: 2},
+    {G:2, V:2, O: 2, P: 2},
+    {G:2, V:2, O: 2, P: 2},
+    //character's favorites
+    {G:4, V:-1, O: -1, P: -1},
+    {G:-1, V:4, O: -1, P: -1},
+    {G:-1, V:-1, O: 4, P: -1},
+    {G:-1, V:-1, O: -1, P: 4},
+];
+
+    characterClasses = ['G', 'V', 'O', 'P'];
+}
+
+function playLots(numberOfGames){
+
+    var totals = { "G":0, "V":0, "O":0, "P":0};
+
+    for(var i = 0; i < numberOfGames; i++){
+        var ret = playGame(4);
+        totals.G += ret.G;
+        totals.V += ret.V;
+        totals.O += ret.O;
+        totals.P += ret.P;
+    }
+
+    //average over games
+        totals.G = totals.G / numberOfGames;
+        totals.V = totals.V / numberOfGames;
+        totals.O = totals.O / numberOfGames;
+        totals.P = totals.P / numberOfGames;
+
+    return totals;
+
+}
+            
+            
+            
+            
+        </script>
+    </body>
+</html>
