@@ -21,6 +21,7 @@
         
         
         <script>
+            var alan = false;
             var categories = [];
             var intialData = [];
             var stepsize = 1;
@@ -155,7 +156,7 @@ var debug = false;
 function playGame(numCharacters){
 
     initializeGame();
-    var numRounds = 7; // 4 players -> 28 cards, 3 players -> 24 cards, 2 players -> 20 cards
+    var numRounds = Math.floor(cards.length / numCharacters);
 
     //shuffle the characters
     characterClasses.sort(function() { return 0.5 - Math.random() } );
@@ -170,25 +171,23 @@ function playGame(numCharacters){
     for(var i = 0, c; c = characters[i]; i++){
         var newPlayer = {};
         newPlayer.CharacterClass = c;
-        newPlayer.currentHand = cards.splice(0,numRounds+1) //grab 6 cards
+        newPlayer.currentHand = cards.splice(0,numRounds-1); //grab 6 cards
         newPlayer.playedCards = [];
         newPlayer.score = 0;
         PlayerArray.push(newPlayer);
     }
 
-    if(debug){
-        console.log("Starting Game");
-        console.log("Players: ");
-        console.log(PlayerArray);
-    }
-
     //go through the rounds of the game
     for(var i = 0; i < numRounds; i++){
-        //pick a card
-        for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
+        
+        // each player picks a card
+        for(var j=0; j < PlayerArray.length; j++){
+            var currentPlayer = PlayerArray[j];
             var cardValue = -20; //assume a super negative value to compare against
             var cardFromSet;
-            for(var k = 0, card; card = currentPlayer.currentHand[k]; k++){
+            
+            for(var k = 0; k < currentPlayer.currentHand.length; k++){
+                var card = currentPlayer.currentHand[k];
                 if(card[currentPlayer.CharacterClass] > cardValue){
                     cardValue = card[currentPlayer.CharacterClass];
                     cardFromSet = card;
@@ -201,13 +200,14 @@ function playGame(numCharacters){
         //pass the cards
         //get the first players hand, to hold and give to the last.
         var placeHolder = PlayerArray[0].currentHand;
-        for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
-            //if it's not the last player in the list
-            if(! typeof PlayerArray[j++] === undefined ){
-                currentPlayer.currentHand = PlayerArray[j++].currentHand;
+        for(var j=0; j < PlayerArray.length; j++){
+            var currentPlayer = PlayerArray[j];
+            //if it's the last hand in the list, swap with the placeholder
+            if(j+1 >= PlayerArray.length ){
+                currentPlayer.currentHand = placeHolder;
             }
             else{
-                currentPlayer.currentHand = placeHolder;
+                currentPlayer.currentHand = PlayerArray[j+1].currentHand;
             }
         }
     }
@@ -272,8 +272,18 @@ function playGame(numCharacters){
     for(var j=0, currentPlayer; currentPlayer = PlayerArray[j]; j++){
         returnScores[currentPlayer.CharacterClass] = currentPlayer.score;
         if(debug){console.log(currentPlayer.CharacterClass + ": "+ currentPlayer.score);}
+        if(currentPlayer.score < 3){
+            alan = true;
+        }
     }
 
+    if(alan){
+        console.log("Weird Game");
+        console.log(PlayerArray);
+        console.log("scores");
+        console.log(returnScores);
+        alan = false;
+    }
     return returnScores;
 }
 
@@ -281,21 +291,21 @@ function initializeGame(){
     cards = [
     //16 base cards
     //current results: 
-    {G:2,  V:3,  O: 1, P: 1},
-    {G:2,  V:3,  O: 1, P: 1},
-    {G:1,  V:2,  O: 1, P: 1},
-    {G:4,  V:1,  O: 1, P: 1},
-    {G:3,  V:0,  O: 1, P: 1},
+    {G:2,  V:3,  O: 2, P: 1},
+    {G:2,  V:2,  O: 1, P: 1},
+    {G:1,  V:2,  O: 2, P: 1},
+    {G:4,  V:1,  O: 2, P: 1},
+    {G:2,  V:0,  O: 2, P: 1},
     {G:2,  V:1,  O: 1, P: 1},
     {G:2,  V:0,  O: 1, P: 0},
     {G:2,  V:-1, O: 2, P: -1},
     {G:0,  V:0,  O: 2, P: 1},
     {G:-1, V:-1, O: 2, P: 2},
-    {G:1,  V:-1, O: 2, P: 2},
+    {G:1,  V:-1, O: 4, P: 2},
     {G:-4, V:-4, O: 3, P: 4},
     {G:1,  V:-1, O: 2, P: 1},
     {G:0,  V:0,  O: 3, P: 2},
-    {G:1,  V:0,  O: 2, P: 1},
+    {G:-1,  V:-1,  O: 2, P: 1},
     {G:1,  V:1,  O: 2, P: 2},    
 
     //good for all
