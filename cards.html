@@ -6,14 +6,13 @@
     
     <style>
         .card{
-            width: 2.4in;
-            height: 3.38in;
+            width: 2.3in;
+            height: 3.24in;
             border-radius:10px;
             border: 1px black solid;
             background-color: #fff;
             float:left; 
             margin: 10px;
-            
         }
         .c{
             padding-left: 10px;
@@ -41,7 +40,8 @@
 }
 
 @media print {
-	.page-break	{ display: block; page-break-before: always; }
+	.page-break	{ display: block; page-break-after: always; }
+    .card{page-break-inside: avoid;};
 }
     </style>
     
@@ -55,7 +55,7 @@
             numberOfCards++;
             var card = cards[i];
             var newCard = "<div class='card'>";
-            newCard += "<p class='c'> &nbsp;&nbsp; </p><br><br><br><br><br><br><br><br>"; //space for a title
+            newCard += "<p class='c'> &nbsp;&nbsp; </p><br><br><br><br><br><br>"; //space for a title
             newCard += "<table class='t'>";
             newCard += "<tr class='c g'><td>Vegetarian: </td><td>"+card.G + "</td></tr>";
             newCard += "<tr class='c v'><td>Vegan: </td><td>"+card.V + "</td></tr>";
@@ -65,9 +65,8 @@
             newCard += "</div>";
             $("#deck").append(newCard);
             
-            if(numberOfCards >= 6){ //add a page break;
+            if(numberOfCards%6==0){ //add a page break every 6 cards
                 $("#deck").append("<div class='page-break'></div>");
-                numberOfCards = 0;
             }
         }
             
