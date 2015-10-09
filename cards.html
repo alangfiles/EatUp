@@ -1,0 +1,111 @@
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    </head>
+<body>
+    
+    <style>
+        .card{
+            width: 2.4in;
+            height: 3.38in;
+            border-radius:10px;
+            border: 1px black solid;
+            background-color: #fff;
+            float:left; 
+            margin: 10px;
+            
+        }
+        .c{
+            padding-left: 10px;
+        }
+        .g{
+            color: blue;
+        }
+        .v{
+            color: green;
+        }
+        .o{
+            color: black;
+        }
+        .p{
+            color: red;
+        }
+        .t{
+            padding:20px;
+            margin: 0 auto;
+            width:80%;
+        }
+
+@media all {
+	.page-break	{ display: none; }
+}
+
+@media print {
+	.page-break	{ display: block; page-break-before: always; }
+}
+    </style>
+    
+    <div id="deck"></div>
+    
+    <script>
+        
+        $(document).ready(function(){
+            var numberOfCards = 0;
+        for(var i = 0; i < cards.length; i++){
+            numberOfCards++;
+            var card = cards[i];
+            var newCard = "<div class='card'>";
+            newCard += "<p class='c'> &nbsp;&nbsp; </p><br><br><br><br><br><br><br><br>"; //space for a title
+            newCard += "<table class='t'>";
+            newCard += "<tr class='c g'><td>Vegetarian: </td><td>"+card.G + "</td></tr>";
+            newCard += "<tr class='c v'><td>Vegan: </td><td>"+card.V + "</td></tr>";
+            newCard += "<tr class='c o'><td>Omnivore: </td><td>"+card.O + "</td></tr>";
+            newCard += "<tr class='c p'><td>Paleo: </td><td>"+card.P + "</td></tr>";
+            newCard += "</table>";
+            newCard += "</div>";
+            $("#deck").append(newCard);
+            
+            if(numberOfCards >= 6){ //add a page break;
+                $("#deck").append("<div class='page-break'></div>");
+                numberOfCards = 0;
+            }
+        }
+            
+        });
+        
+    cards = [
+    //16 base cards
+    //current results: 
+    {G:2,  V:3,  O: 2, P: 1},
+    {G:2,  V:2,  O: 1, P: 1},
+    {G:1,  V:2,  O: 2, P: 1},
+    {G:4,  V:1,  O: 2, P: 1},
+    {G:2,  V:0,  O: 2, P: 1},
+    {G:2,  V:1,  O: 1, P: 1},
+    {G:2,  V:0,  O: 1, P: 0},
+    {G:2,  V:-1, O: 2, P: -1},
+    {G:0,  V:0,  O: 2, P: 1},
+    {G:-1, V:-1, O: 2, P: 2},
+    {G:1,  V:-1, O: 4, P: 2},
+    {G:-4, V:-4, O: 3, P: 4},
+    {G:1,  V:-1, O: 2, P: 1},
+    {G:0,  V:0,  O: 3, P: 2},
+    {G:-1,  V:-1,  O: 2, P: 1},
+    {G:1,  V:1,  O: 2, P: 2},    
+
+    //good for all
+    {G:2, V:2, O: 2, P: 2},
+    {G:2, V:2, O: 2, P: 2},
+    {G:2, V:2, O: 2, P: 2},
+    {G:2, V:2, O: 2, P: 2},
+    //character's favorites
+    {G:4, V:-1, O: -1, P: -1},
+    {G:-1, V:4, O: -1, P: -1},
+    {G:-1, V:-1, O: 4, P: -1},
+    {G:-1, V:-1, O: -1, P: 4},
+];
+
+    </script>
+    
+</body>
+</html>
