@@ -34,6 +34,20 @@
             margin: 0 auto;
             width:80%;
         }
+        .description{
+            text-align:center;
+            font-size:28px;
+            padding-bottom:10px;
+        }
+        .title{
+            text-align:center;
+            font-size:36px;
+        }
+        .text{
+            font-size:16px;
+            padding:10px;
+            
+        }
 
 @media all {
 	.page-break	{ display: none; }
@@ -55,13 +69,26 @@
             numberOfCards++;
             var card = cards[i];
             var newCard = "<div class='card'>";
-            newCard += "<p class='c'> &nbsp;&nbsp; </p><br><br><br><br><br><br>"; //space for a title
-            newCard += "<table class='t'>";
-            newCard += "<tr class='c g'><td>Vegetarian: </td><td>"+card.G + "</td></tr>";
-            newCard += "<tr class='c v'><td>Vegan: </td><td>"+card.V + "</td></tr>";
-            newCard += "<tr class='c o'><td>Omnivore: </td><td>"+card.O + "</td></tr>";
-            newCard += "<tr class='c p'><td>Paleo: </td><td>"+card.P + "</td></tr>";
-            newCard += "</table>";
+            if(card.Bonus == true){
+                newCard += "<p class='description'> BONUS!</p>";
+                newCard += "<p class='title'>"+card.title+"</p>";
+                newCard += "<p class='text'>"+card.text+"</p>";
+            }
+            else if(card.Character == true){
+                newCard += "<p class='description'> Character:</p>";
+                newCard += "<p class='title'>"+card.title+"</p>";
+                newCard += "<p class='text'>"+card.text+"</p>";
+            }
+            else{
+                newCard += "<p class='c'> &nbsp;&nbsp; </p><br><br><br><br><br><br>"; //space for a title
+                newCard += "<table class='t'>";
+                newCard += "<tr class='c g'><td>Vegetarian: </td><td>"+card.G + "</td></tr>";
+                newCard += "<tr class='c v'><td>Vegan: </td><td>"+card.V + "</td></tr>";
+                newCard += "<tr class='c o'><td>Omnivore: </td><td>"+card.O + "</td></tr>";
+                newCard += "<tr class='c p'><td>Paleo: </td><td>"+card.P + "</td></tr>";
+                newCard += "</table>";
+                
+            }
             newCard += "</div>";
             $("#deck").append(newCard);
             
@@ -102,6 +129,22 @@
     {G:-1, V:4, O: -1, P: -1},
     {G:-1, V:-1, O: 4, P: -1},
     {G:-1, V:-1, O: -1, P: 4},
+        
+        
+        {Bonus:true, title:"Seconds please!", text:"Double the point value of a meal"},
+        {Bonus:true, title:"Breadwinner", text:"If you feed everyone by the end of round 3, get +6 points!"},
+        {Bonus:true, title:"Cheat Day!", text:"Break your rule (can eat anything, and gets +2 points for the meal)"},
+        {Bonus:true, title:"Cheat Day!", text:"Break your rule (can eat anything, and gets +2 points for the meal)"},
+        {Bonus:true, title:"Food Poisoning", text:"Destroy someone's meal (it becomes 0 points)"},
+        {Bonus:true, title:"Food Poisoning", text:"Destroy someone's meal (it becomes 0 points)"},
+        {Bonus:true, title:"Sweet Sauce", text:"Add +2 to a meal"},
+        {Bonus:true, title:"Sweet Sauce", text:"Add +2 to a meal"},
+        
+        {Character:true, title:"Vegetarian",text:"The vegetarian gets +2 points for each 2 meals they can eat."},
+        {Character:true, title:"Vegan",text:"The vegan gets +2 points for each meal they can eat"},
+        {Character:true, title:"Omnivore",text:"The omnivore gets a token for each other player in the game. In the 3rd round, they can use each token to either add 1 or subtract 1 from a meal"},
+        {Character:true, title:"Paleo",text:"The paleo gets 1 token to double the value of a meal in round 3."},
+        
 ];
 
     </script>
